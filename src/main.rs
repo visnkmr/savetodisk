@@ -54,11 +54,15 @@ fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str)->String{
     let date = Local::now();
     let current_date = date.format("%Y-%m-%d %H:%M:%S").to_string();
     let start="| ".to_string();
+    prefstore::initcustomfile(
+        APPNAME,
+         "links.md",
+        "|Source|Date|Title|URL|\n|-----|----|----|----|\n"
+        );
     let log=
     start+
     &addr.to_string()+" | "
     +current_date.as_str()+" | "
-    +url+" | "
     +linktitle+" | "
     +linkurl+" |\n";
    log
@@ -84,6 +88,7 @@ fn handle_client(mut request:Request)->Result<(),()> {
             let url = v["url"].as_str().unwrap();
             let title = v["title"].as_str().unwrap();
             println!("addnote body: {:?}",v);
+            
             // println!("addnote body: {:?}",url2str(body));
             // let mut ret:Vec<String>=vec![];
             // ret=serde_json::from_str(body).unwrap();
