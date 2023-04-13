@@ -102,10 +102,11 @@ fn handle_client(mut request:Request)->Result<(),()> {
                     request.remote_addr().unwrap().ip().to_string().as_str(),
                 )
                 );
+            drop(request);
             // redirect(request,"/")?;
-            request.respond(Response::from_string("OK").with_status_code(StatusCode(200))).map_err(|err|{
-                eprintln!("could not serve request error {}",err);
-            })?;
+            // request.respond(Response::from_string("OK").with_status_code(StatusCode(200))).map_err(|err|{
+            //     eprintln!("could not serve request error {}",err);
+            // })?;
             
         }
     }
