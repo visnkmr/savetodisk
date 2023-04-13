@@ -53,11 +53,14 @@ fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str)->String{
     // let tosave=(ls.toi32()+1);
     let date = Local::now();
     let current_date = date.format("%Y-%m-%d %H:%M:%S").to_string();
-    let log=addr.to_string()+"--"
-    +current_date.as_str()+": "
-    +url+"---\t\t"
-    +linktitle+"---"
-    +linkurl+"\n";
+    let start="| ".to_string();
+    let log=
+    start+
+    &addr.to_string()+" | "
+    +current_date.as_str()+" | "
+    +url+" | "
+    +linktitle+" | "
+    +linkurl+" |\n";
    log
     
 }
@@ -86,7 +89,7 @@ fn handle_client(mut request:Request)->Result<(),()> {
             // ret=serde_json::from_str(body).unwrap();
             prefstore::appendcustom(
                 APPNAME,
-                 "links.txt", 
+                 "links.md", 
                  savelink(
                     url,
                     title,
