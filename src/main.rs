@@ -48,7 +48,7 @@ fn logevent(url:&str,addr:&str,method:&str){
     appendcustom(APPNAME,"events.log",log);
     
 }
-fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str)->String{
+fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str,foldername:&str)->String{
     // let ls=getcustom("todo","events.log","");
     // let tosave=(ls.toi32()+1);
     let date = Local::now();
@@ -56,7 +56,7 @@ fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str)->String{
     let start="| ".to_string();
     prefstore::initcustomfile(
         APPNAME,
-         "links.md",
+         foldername,
         "|Source|Date|Title|URL|\n|-----|----|----|----|\n"
         );
     let log=
@@ -87,26 +87,34 @@ fn handle_client(mut request:Request)->Result<(),()> {
             let v:Value=serde_json::from_str(&body).unwrap();
             let url = v["url"].as_str().unwrap();
             let title = v["title"].as_str().unwrap();
+            let foldername = v["folder"].as_str().unwrap();
             println!("addnote body: {:?}",v);
+            let savelocation=if foldername.is_empty(){
+                format!("links.md")
+            }else{
+                format!("{}/links.md",foldername)
+            };
             
             // println!("addnote body: {:?}",url2str(body));
             // let mut ret:Vec<String>=vec![];
             // ret=serde_json::from_str(body).unwrap();
             prefstore::appendcustom(
                 APPNAME,
-                 "links.md", 
+                 savelocation.clone(), 
                  savelink(
                     url,
                     title,
                     request.url(),
                     request.remote_addr().unwrap().ip().to_string().as_str(),
+                    savelocation.clone().as_str()
                 )
                 );
-            drop(request);
+                let h="Ok";
+            // drop(request);
             // redirect(request,"/")?;
-            // request.respond(Response::from_string("OK").with_status_code(StatusCode(200))).map_err(|err|{
-            //     eprintln!("could not serve request error {}",err);
-            // })?;
+            request.respond(Response::from_string(serde_json::to_string(&h).unwrap()).with_status_code(StatusCode(200))).map_err(|err|{
+                eprintln!("could not serve request error {}",err);
+            })?;
             
         }
     }
