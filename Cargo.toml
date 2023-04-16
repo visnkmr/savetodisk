@@ -32,7 +32,7 @@ tiny_http="0.12.0"
 serde_json="1.0.94"
 # serde={version = "1.0.158", features = ["derive"]}
 # regex="1.7.3"
-prefstore={path="/home/roger/Downloads/rust/prefstore/prefstore/"}
+prefstore = { git = "https://github.com/visnkmr/prefstore/" }
 # prefstore="0.4.0"
 # tera={version="1.18.1"}#, features=["serde"]}
 # prefstore="0.2.0"
