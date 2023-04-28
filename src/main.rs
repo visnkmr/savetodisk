@@ -8,6 +8,7 @@ use std::net::{TcpListener, TcpStream};
 use chrono::Local;
 // use alloc::task;
 use prefstore::{savepreference, ems, getcustom, savecustom, appendcustom};
+use regex::Regex;
 use serde_json::Value;
 // use regex::Regex;
 // use tera::{Tera, Context};
@@ -48,6 +49,19 @@ fn logevent(url:&str,addr:&str,method:&str){
     appendcustom(APPNAME,"events.log",log);
     
 }
+fn remove_markdown_tags(str: &str) -> String {
+    // Define a regular expression that matches common markdown tags
+    // such as #, *, _, ~, [, ], (, ), <, >, etc.
+    // Note: this is not a comprehensive regex for all markdown syntax
+    let regex = Regex::new(r#"[#*_~\[\]()<>`\\\-]+"#).unwrap();
+    // Replace the matched tags with an empty string
+    let result = regex.replace_all(str, "");
+   let result=result.replace("|"," ");
+    println!("{}",result);
+
+    // Return the result as a String
+    result
+}
 fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str,foldername:&str)->String{
     // let ls=getcustom("todo","events.log","");
     // let tosave=(ls.toi32()+1);
@@ -63,7 +77,7 @@ fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str,foldername:&str)->Str
     start+
     &addr.to_string()+" | "
     +current_date.as_str()+" | "
-    +linktitle+" | "
+    +&remove_markdown_tags(linktitle)+" | "
     +linkurl+" |\n";
    log
     
