@@ -1,13 +1,13 @@
 #![allow(warnings)] 
 use std::collections::HashMap;
-use std::fmt;
+use std::{fmt, thread};
 use std::fs::File;
 use std::future::Pending;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use chrono::Local;
 // use alloc::task;
-use prefstore::{savepreference, ems, getcustom, savecustom, appendcustom};
+use prefstore::{savepreference, ems, getcustom, savecustom, appendcustom, prefstore_directory};
 use regex::Regex;
 use serde_json::Value;
 // use regex::Regex;
@@ -106,6 +106,7 @@ fn handle_client(mut request:Request)->Result<(),()> {
             let savelocation=if foldername.is_empty(){
                 format!("links.md")
             }else{
+                
                 format!("{}/links.md",foldername)
             };
             
@@ -147,14 +148,78 @@ fn handle_client(mut request:Request)->Result<(),()> {
     
     Ok(())
 }
+// Define a function that takes a path to a markdown file and returns its html content
+fn render_markdown_file(filename: &str) -> String {
+    
+    // Create a string to hold the file contents
+    let mut contents = 
+    if(!filename.is_empty()){
+
+        getcustom(&APPNAME.to_string(),filename,"")
+    }
+    else{
+        String::new()
+    };
+    if(!contents.is_empty()){
+
+        // Convert the markdown string to html using the markdown crate
+        markdown::to_html_with_options(
+            &contents ,
+            &markdown::Options::gfm()
+        ).unwrap()
+    }
+    else{
+        "No saved sessions found".to_string()
+    }
+}
+
+// Define a function that takes a path to a markdown file and serves it as html using the tiny_http crate
+fn serve_markdown_file(serverurl: &str) -> Result<(), ()> {
+    // Create a server on port 8000
+    let server = Server::http(serverurl).unwrap();
+    // Loop over incoming requests
+    for request in server.incoming_requests() {
+        // Print some information about the request
+        println!("received request! method: {:?}, url: {:?}, headers: {:?}",
+            request.method(),
+            request.url(),
+            request.headers()
+        );
+        let content_header=Header::from_bytes(
+            "Content-Type"
+            ,"text/html; charset=utf-8"
+        )
+        .expect("valid or not");
+        // Create a response with the html content and a content type header
+        let responsestr=render_markdown_file(
+            &prefstore::get_last_from_buffer(APPNAME, ".l5"));
+        let response = 
+        Response::from_string(
+            responsestr
+            )
+            .with_header(content_header);
+        // Send the response to the client
+        request.respond(response).unwrap();
+    }
+    // Return Ok if no errors occurred
+    Ok(())
+}
+
+// Call the function with a sample markdown file path
 
 fn main() ->Result<(),()>{
-    let address="127.0.0.1:8080".to_string();
+    let address="127.0.0.1".to_string();
+    let port="8080".to_string();
+    let serveurl=format!("{}:{}",address,port);
+    let servemd=format!("{}:{}",address,"7890");
+    thread::spawn(move||{
+        serve_markdown_file(&servemd);
+    });
     
-    let server=Server::http(&address).map_err(|err|{
+    let server=Server::http(&serveurl).map_err(|err|{
         eprintln!("{err}")
     })?;
-    println!("listening @ {}",address);
+    println!("listening @ {}",serveurl);
     for request in server.incoming_requests(){
         handle_client(request);
     }
