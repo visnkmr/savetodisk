@@ -71,12 +71,10 @@ fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str,foldername:&str)->Str
     prefstore::initcustomfile(
         APPNAME,
          foldername,
-        "|Source|Date|Title|URL|\n|-----|----|----|----|\n"
+        "|Title|URL|\n|-----|----|\n"
         );
     let log=
-    start+
-    &addr.to_string()+" | "
-    +current_date.as_str()+" | "
+    start
     +&remove_markdown_tags(linktitle)+" | "
     +linkurl+" |\n";
    log
