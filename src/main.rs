@@ -122,8 +122,13 @@ fn handle_client(mut request:Request)->Result<(),()> {
                     request.remote_addr().unwrap().ip().to_string().as_str(),
                     savelocation.clone().as_str()
                 )
-                );
-                let h="Ok";
+            );
+            prefstore::savebuffer(APPNAME
+                , ".l5"
+                , savelocation.clone()
+                , 5);
+            println!("{}",prefstore::get_last_from_buffer(APPNAME,".l5"));
+            let h="Ok";
             // drop(request);
             // redirect(request,"/")?;
             request.respond(Response::from_string(serde_json::to_string(&h).unwrap()).with_status_code(StatusCode(200))).map_err(|err|{
