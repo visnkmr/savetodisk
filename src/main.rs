@@ -131,9 +131,16 @@ fn handle_client(mut request:Request)->Result<(),()> {
             let h="Ok";
             // drop(request);
             // redirect(request,"/")?;
-            request.respond(Response::from_string(serde_json::to_string(&h).unwrap()).with_status_code(StatusCode(200))).map_err(|err|{
-                eprintln!("could not serve request error {}",err);
-            })?;
+            request.respond(
+                Response::from_string(
+                    serde_json::to_string(&h).unwrap()
+                ).
+                with_status_code(StatusCode(200))).
+                map_err(
+                    |err|{
+                        eprintln!("could not serve request error {}",err);
+                    }
+                )?;
             
         }
     }
