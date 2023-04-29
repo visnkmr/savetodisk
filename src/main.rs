@@ -185,9 +185,10 @@ fn handle_client(mut request:Request)->Result<(),()> {
 
 fn main() ->Result<(),()>{
     let address="127.0.0.1".to_string();
+    let ipaddress="0.0.0.0".to_string();
     let port="8080".to_string();
     let serveurl=format!("{}:{}",address,port);
-    let servemd=format!("{}:{}",address,"7890");
+    let servemd=format!("{}:{}",ipaddress,"7890");
     thread::spawn(move||{
         // serve_markdown_file(&servemd);
         fsovernet::serve(&servemd);

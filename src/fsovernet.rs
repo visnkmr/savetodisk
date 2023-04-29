@@ -6,7 +6,7 @@ use std::{fs, io::Cursor, path::Path};
 // Define a function that returns a HTML string with the list of files in a given directory
 fn list_files(dir: &str) -> String {
     let path=Path::new(dir);
-    if(path.is_file()){
+    if(path.is_file() || !path.exists()){
         return r#"
                 <html>
                 <body>
@@ -87,6 +87,7 @@ fn handle_request(path: &str) -> Response<Cursor<Vec<u8>>> {
         ,"text/html; charset=utf-8"
     )
     .expect("valid or not");
+
     // let response = 
     //         Response::from_string(
     //             list_files(".")
