@@ -1,5 +1,6 @@
 #![allow(warnings)] 
 use std::collections::HashMap;
+use std::sync::{Mutex, Arc};
 use std::{fmt, thread};
 use std::fs::File;
 use std::future::Pending;
@@ -15,7 +16,7 @@ use serde_json::Value;
 // use tera::{Tera, Context};
 use tiny_http::{Server, Response, Header, Request, Method, StatusCode};
 use url::form_urlencoded;
-
+mod perlink;
 const APPNAME:&str="LogLinktoDisk";
 
 fn redirect(request:Request, path:&str)->Result<(),()>{
@@ -81,7 +82,7 @@ fn savelink(linkurl:&str,linktitle:&str,url:&str,addr:&str,foldername:&str)->Str
    log
     
 }
-fn handle_client(mut request:Request)->Result<(),()> {
+fn handle_client(mut request:Request,state:Arc<Mutex<String>>)->Result<(),()> {
     
     logevent(request.url(),
     request.remote_addr().unwrap().ip().to_string().as_str(),
@@ -99,35 +100,46 @@ fn handle_client(mut request:Request)->Result<(),()> {
             // println!("addnote body: {:?}",body);
             let v:Value=serde_json::from_str(&body).unwrap();
             let url = v["url"].as_str().unwrap();
+            let i=url.clone().to_string();
+            // let i=url.clone();
             let title = v["title"].as_str().unwrap();
             let foldername = v["folder"].as_str().unwrap();
-            println!("addnote body: {:?}",v);
-            let savelocation=if foldername.is_empty(){
-                format!("links.md")
-            }else{
+            println!("addnote body: {:?}",v.clone());
+            let mut state = state.lock().unwrap();
+            *state=url.to_string();
+            // thread::spawn(move||{
                 
-                format!("{}/links.md",foldername)
-            };
+        //     // serve_markdown_file(&servemd);
+            //     fsovernet::serve(&servemd);
+                //    perlink::samplewindow();
+                // perlink::showui(i);
+            // });
+            // let savelocation=if foldername.is_empty(){
+            //     format!("links.md")
+            // }else{
+                
+            //     format!("{}/links.md",foldername)
+            // };
             
-            // println!("addnote body: {:?}",url2str(body));
-            // let mut ret:Vec<String>=vec![];
-            // ret=serde_json::from_str(body).unwrap();
-            prefstore::appendcustom(
-                APPNAME,
-                 savelocation.clone(), 
-                 savelink(
-                    url,
-                    title,
-                    request.url(),
-                    request.remote_addr().unwrap().ip().to_string().as_str(),
-                    savelocation.clone().as_str()
-                )
-            );
-            prefstore::savebuffer(APPNAME
-                , ".l5"
-                , savelocation.clone()
-                , 5);
-            println!("{}",prefstore::get_last_from_buffer(APPNAME,".l5"));
+            // // println!("addnote body: {:?}",url2str(body));
+            // // let mut ret:Vec<String>=vec![];
+            // // ret=serde_json::from_str(body).unwrap();
+            // prefstore::appendcustom(
+            //     APPNAME,
+            //      savelocation.clone(), 
+            //      savelink(
+            //         url,
+            //         title,
+            //         request.url(),
+            //         request.remote_addr().unwrap().ip().to_string().as_str(),
+            //         savelocation.clone().as_str()
+            //     )
+            // );
+            // prefstore::savebuffer(APPNAME
+            //     , ".l5"
+            //     , savelocation.clone()
+            //     , 5);
+            // println!("{}",prefstore::get_last_from_buffer(APPNAME,".l5"));
             let h="Ok";
             // drop(request);
             // redirect(request,"/")?;
@@ -188,19 +200,23 @@ fn main() ->Result<(),()>{
     let port="8080".to_string();
     let serveurl=format!("{}:{}",address,port);
     let servemd=format!("{}:{}",address,"7890");
-    thread::spawn(move||{
-        // serve_markdown_file(&servemd);
-        fsovernet::serve(&servemd);
+    let state = Arc::new(Mutex::new(String::new()));
 
-    });
-    
-    let server=Server::http(&serveurl).map_err(|err|{
-        eprintln!("{err}")
-    })?;
-    println!("listening @ {}",serveurl);
-    for request in server.incoming_requests(){
-        handle_client(request);
-    }
+    // spawn a thread to handle incoming requests
+    let state_clone = state.clone();
+    thread::spawn(move||{
+    //     // serve_markdown_file(&servemd);
+    //     fsovernet::serve(&servemd);
+        let server=Server::http(&serveurl).map_err(|err|{
+                eprintln!("{err}")
+            }).unwrap();
+        println!("listening @ {}",serveurl);
+        for request in server.incoming_requests(){
+                handle_client(request,state.clone());
+            }
+        }
+    );
+    perlink::showui(state_clone);
     Ok(())
 }
 #[cfg(test)]

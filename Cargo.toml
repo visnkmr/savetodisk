@@ -34,8 +34,24 @@ markdown={git="https://github.com/wooorm/markdown-rs.git"}
 regex="1.8.1"
 # serde={version = "1.0.158", features = ["derive"]}
 # regex="1.7.3"
-prefstore = { git = "https://github.com/visnkmr/prefstore/" }
+# prefstore = { git = "https://github.com/visnkmr/prefstore/" }
+prefstore = { path = "../../rust/prefstore/prefstore" }
 # prefstore="0.4.0"
 # tera={version="1.18.1"}#, features=["serde"]}
 # prefstore="0.2.0"
+fltk = "^1.3"
+# app-center = { git = "https://github.com/jeff-hiner/appcenter-rs" }
+human-panic = { git = "https://github.com/visnkmr/save-crash-logs-rs" }
+# prefstore = { git = "https://github.com/visnkmr/prefstore/" }
+isahc = { features = ["text-decoding"], default-features = false, version = "1.7" }
+# execute = "0.2.11"
+# abserde = {version="0.4.1", features= ["toml"], default-features = false }
+# prefstore="0.5.0"
+# prefstore={path="./../prefstore/prefstore"}
+# abserde = "0.3.3"
+serde = {version = "1.0.140", default-features = false }
+window_titles = { git = "https://github.com/HiruNya/window_titles"}
+linkify = "0.9.0"
+arboard = { default-features = false, version = "3.1.0" }
+indexmap = { version = "1.9.1", features = ["serde"] }
 
