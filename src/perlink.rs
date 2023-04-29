@@ -585,7 +585,7 @@ let (s, r) = fltk::app::channel();
                 40) ;
                 fltk::frame::Frame::default().with_size(20, 30);
             
-            let mut eub = Button::default().with_size(150,30);
+            let mut eub = Button::default().with_size(120,30);
             eub.set_label("expand url");
             eub.emit(s.clone(),"expandurl".to_string());
             // b1.emit(s, "refresh".to_string());
@@ -618,11 +618,14 @@ let (s, r) = fltk::app::channel();
             //     }
             //     _ => false,
             // });
-            let mut but = Button::new(160, 260, 80, 30, "Refresh");
+            fltk::frame::Frame::default().with_size(10, 10);
+            let mut but = Button::default().with_size( 70, 30);
+            but.set_label("Refresh");
             but.emit(s.clone(),"refresh".to_string());
-            fltk::frame::Frame::default().with_size(20, 10);
+            // fltk::frame::Frame::default().with_size(10, 10);
+            fltk::frame::Frame::default().with_size(10, 10);
             // let mut bframe1 = fltk::frame::Frame::default().with_size(300, 60);
-            let mut b11 = Button::default().with_size(150,30);
+            let mut b11 = Button::default().with_size(120,30);
             b11.set_label("All browsers");
             // b1.emit(s, "refresh".to_string());
             // let mut hpack=hpack.clone();
@@ -650,6 +653,7 @@ let (s, r) = fltk::app::channel();
 
             ttb.end();
             ttb.set_type(fltk::group::PackType::Horizontal);
+            
             fltk::frame::Frame::default().with_size(10, 10);
             let mut ttb=fltk::group::Pack::default().with_size(
                 10,
@@ -672,6 +676,7 @@ let (s, r) = fltk::app::channel();
             //     _ => false,
             // });
             fltk::frame::Frame::default().with_size(20, 10);
+            
             // let mut bframe1 = fltk::frame::Frame::default().with_size(300, 60);
             let mut svc = Button::default().with_size(150,30);
                 svc.set_label("copy to clipboard");
