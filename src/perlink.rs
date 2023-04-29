@@ -31,7 +31,7 @@ use std::collections::HashMap;
 
 use std::fs::create_dir_all;
 // const APP_INFO: AppInfo = AppInfo{name: "Perlink", author: "visnk"};
-const appname: &str = "perlink";
+const appname: &str = "savetodisk-perlink";
 fn eurl(t: String) -> Result<String,()> {
     // return Ok("try".to_string());
     println!("get {} val----->{}","expanding",t);
